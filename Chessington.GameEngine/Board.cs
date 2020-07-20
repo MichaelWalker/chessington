@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using Chessington.GameEngine.Pieces;
+ using System.Runtime.InteropServices;
+ using Chessington.GameEngine.Pieces;
 
 namespace Chessington.GameEngine
 {
@@ -28,6 +29,12 @@ namespace Chessington.GameEngine
         public Piece GetPiece(Square square)
         {
             return _board[square.Row, square.Col];
+        }
+
+        public bool IsSquareFree(Square square)
+        {
+            var piece = GetPiece(square);
+            return piece == null;
         }
         
         public Square FindPiece(Piece piece)

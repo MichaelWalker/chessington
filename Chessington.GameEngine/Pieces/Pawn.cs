@@ -1,7 +1,5 @@
 ﻿﻿using System.Collections.Generic;
-using System.Linq;
- using System.Runtime.ConstrainedExecution;
-
+ 
  namespace Chessington.GameEngine.Pieces
 {
     public class Pawn : Piece
@@ -12,47 +10,53 @@ using System.Linq;
         public override IEnumerable<Square> GetAvailableMoves(Board board)
         {
             var currentSquare = board.FindPiece(this);
+            var nextSquare = NextSquare(currentSquare);
+            var squareTwoInFront = NextSquare(nextSquare);
 
-            if (HasMoved(currentSquare))
+            var availableMoves = new List<Square>();
+
+            if (CanMoveForwardOneSquare(board, nextSquare))
             {
-                if (Player == Player.Black)
-                {
-                    return new List<Square>
-                    {
-                        Square.At(currentSquare.Row + 1, currentSquare.Col)
-                    };
-                }
-                
-                return new List<Square>
-                {
-                    Square.At(currentSquare.Row - 1, currentSquare.Col)
-                };
+                availableMoves.Add(nextSquare);
             }
             
-            if (Player == Player.Black)
+            if (CanMoveForwardTwoSquares(board, currentSquare, nextSquare, squareTwoInFront))
             {
-                return new List<Square>
-                {
-                    Square.At(currentSquare.Row + 1, currentSquare.Col),
-                    Square.At(currentSquare.Row + 2, currentSquare.Col)
-                };
+                availableMoves.Add(squareTwoInFront);
             }
-                
-            return new List<Square>
-            {
-                Square.At(currentSquare.Row - 1, currentSquare.Col),
-                Square.At(currentSquare.Row - 2, currentSquare.Col)
-            };
+
+            return availableMoves;
         }
 
-        private bool HasMoved(Square currentSquare)
+        private bool CanMoveForwardOneSquare(Board board, Square nextSquare)
+        {
+            return board.IsSquareFree(nextSquare);
+        }
+
+        private bool CanMoveForwardTwoSquares(Board board, Square currentSquare, Square nextSquare, Square squareTwoInFront)
+        {
+            return HasNotMoved(currentSquare)
+                   && board.IsSquareFree(nextSquare)
+                   && board.IsSquareFree(squareTwoInFront);
+        }
+
+        private Square NextSquare(Square currentSquare)
         {
             if (Player == Player.Black)
             {
-                return currentSquare.Row != 1;
+                return Square.At(currentSquare.Row + 1, currentSquare.Col);
+            }
+            return Square.At(currentSquare.Row - 1, currentSquare.Col);
+        }
+
+        private bool HasNotMoved(Square currentSquare)
+        {
+            if (Player == Player.Black)
+            {
+                return currentSquare.Row == 1;
             }
 
-            return currentSquare.Row != 6;
+            return currentSquare.Row == 6;
         }
     }
 }
